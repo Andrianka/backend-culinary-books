@@ -3,9 +3,10 @@ import { wrap } from '@mikro-orm/core';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { validate } from 'class-validator';
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDeleteResponse } from './interfaces/responses/userDelete.response';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserBadRequestException } from './exceptions/user-bad-request.exception';
 
 export class UserRepository extends EntityRepository<User> {
   async findByEmail(email: string, filters?): Promise<User> {
@@ -17,13 +18,7 @@ export class UserRepository extends EntityRepository<User> {
       },
     );
     if (!user) {
-      throw new HttpException(
-        {
-          message: 'Not Found',
-          errors: { user: 'Not found' },
-        },
-        HttpStatus.NOT_FOUND,
-      );
+      throw new UserNotFoundException();
     }
     return user;
   }
@@ -38,13 +33,7 @@ export class UserRepository extends EntityRepository<User> {
     );
 
     if (!user) {
-      throw new HttpException(
-        {
-          message: 'Not Found',
-          errors: { user: 'Not found' },
-        },
-        HttpStatus.NOT_FOUND,
-      );
+      throw new UserNotFoundException();
     }
     return user;
   }
@@ -58,13 +47,7 @@ export class UserRepository extends EntityRepository<User> {
     const errors = await validate(user);
 
     if (errors.length > 0) {
-      throw new HttpException(
-        {
-          message: 'Input data validation failed',
-          errors: { username: 'Userinput is not valid.' },
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new UserBadRequestException('Input data validation failed');
     } else {
       await this.em.persistAndFlush(user);
     }
@@ -77,13 +60,7 @@ export class UserRepository extends EntityRepository<User> {
     const errors = await validate(user);
 
     if (errors.length > 0) {
-      throw new HttpException(
-        {
-          message: 'Input data validation failed',
-          errors: { username: 'Userinput is not valid.' },
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new UserBadRequestException('Input data validation failed');
     } else {
       await this.em.persistAndFlush(user);
     }

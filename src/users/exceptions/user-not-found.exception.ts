@@ -2,7 +2,10 @@ import { NotFoundException } from '@nestjs/common';
 import { ErrorEnum } from '../../common/error.enum';
 
 export class UserNotFoundException extends NotFoundException {
-  constructor() {
-    super(ErrorEnum.UserNotFound);
+  constructor(message?: string) {
+    super(message, {
+      cause: new Error(),
+      description: ErrorEnum.UserNotFound,
+    });
   }
 }
