@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { RecipeRepository } from './recipes.repository';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class RecipesService {
+  constructor(
+    private readonly recipeRepository: RecipeRepository,
+    private readonly categoryService: CategoriesService,
+  ) {}
+
   create(createRecipeDto: CreateRecipeDto) {
-    return 'This action adds a new recipe';
+    return this.recipeRepository.createRecipe(createRecipeDto);
   }
 
   findAll() {
-    return `This action returns all recipes`;
+    return this.recipeRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} recipe`;
+  findOne(id: string) {
+    return this.recipeRepository.getById(id);
   }
 
-  update(id: number, updateRecipeDto: UpdateRecipeDto) {
-    return `This action updates a #${id} recipe`;
+  async update(id: string, updateRecipeDto: UpdateRecipeDto) {
+    const category = await this.categoryService.findByNameOrCreate(
+      updateRecipeDto.categoryName,
+    );
+    return this.recipeRepository.updateRecipe(id, category.id, updateRecipeDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} recipe`;
+  softDelete(id: string) {
+    return this.recipeRepository.softDelete(id);
   }
 }

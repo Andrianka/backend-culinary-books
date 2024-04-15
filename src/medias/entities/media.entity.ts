@@ -1,6 +1,7 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/core';
 import { BaseEntity } from '../../common/BaseEntity.entity';
 import { FileStorageType } from '../types';
+import { Recipe } from '../../recipes/entities/recipe.entity';
 
 @Entity()
 export class Media extends BaseEntity {
@@ -18,4 +19,7 @@ export class Media extends BaseEntity {
 
   @Property({ name: 'mime_type', nullable: true })
   public mimeType?: string;
+
+  @ManyToOne()
+  recipe: Recipe;
 }
