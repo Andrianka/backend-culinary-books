@@ -1,18 +1,31 @@
-import { Entity, Opt, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  EntityRepositoryType,
+  Index,
+  Opt,
+  Property,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../../common/BaseEntity.entity';
-import { UserRoleType } from '../types';
+import { UserRole, UserRoleType } from '../types';
+import { UserRepository } from '../users.repository';
 
-@Entity()
+@Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {
-  @Property()
-  email: string;
+  [EntityRepositoryType]?: UserRepository;
 
-  @Property()
-  password: string;
+  @Property({ unique: true })
+  email!: string;
+
+  @Property({ hidden: true })
+  password!: string;
 
   @Property()
   termsAccepted: boolean & Opt = false;
 
-  @Property()
+  @Property({ default: UserRole.USER })
   role: UserRoleType;
+
+  @Index()
+  @Property({ nullable: true, type: 'timestamptz' })
+  deletedAt?: Date;
 }

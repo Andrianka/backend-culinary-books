@@ -1,6 +1,6 @@
 import { UserRoleType } from '../types/index';
 
-export interface User {
+export interface IUser {
   email: string;
   role: UserRoleType;
 }
