@@ -1,42 +1,52 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserTransformer } from './transformers/user.transformer';
+import { UserResponse } from './interfaces/responses/user.response';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly userTransformer: UserTransformer,
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.createUser(createUserDto);
+    return this.userTransformer.transform(user);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(): Promise<UserResponse[]> {
+    const users = await this.usersService.findAll();
+    return this.userTransformer.transformAllUsers(users);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<UserResponse> {
+    const user = await this.usersService.getById(id);
+    return this.userTransformer.transform(user);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponse> {
+    const user = await this.usersService.updateUser(id, updateUserDto);
+    return this.userTransformer.transform(user);
   }
 
-  @Delete(':id')
+  @Patch(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    return this.usersService.softDelete(id);
+  }
+
+  @Patch(':id')
+  async restore(@Param('id') id: string): Promise<UserResponse> {
+    const user = await this.usersService.restoreUser(id);
+    return this.userTransformer.transform(user);
   }
 }

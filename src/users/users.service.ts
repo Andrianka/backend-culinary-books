@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './users.repository';
+import { UserDeleteResponse } from './interfaces/responses/userDelete.response';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly userRepository: UserRepository) {}
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const { email, password, role } = createUserDto;
+    const user = await this.userRepository.findByEmail(email);
+    if (user) {
+      throw new HttpException(
+        {
+          message: 'Input data validation failed',
+          errors: { email: 'Email must be unique.' },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return await this.userRepository.createUser({
+      email,
+      password,
+      role,
+    });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return this.userRepository.findAll();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findByEmail(email: string): Promise<User> {
+    return this.userRepository.findByEmail(email);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async getById(id: string): Promise<User> {
+    return this.userRepository.getById(id);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userRepository.updateUser(id, updateUserDto);
+  }
+
+  async softDelete(id: string): Promise<UserDeleteResponse> {
+    return this.userRepository.softDelete(id);
+  }
+
+  async restoreUser(id: string): Promise<User> {
+    return this.userRepository.restoreUser(id);
   }
 }
