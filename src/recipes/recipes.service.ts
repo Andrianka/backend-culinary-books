@@ -27,7 +27,7 @@ export class RecipesService {
     const category = await this.categoryService.findByNameOrCreate(
       updateRecipeDto.categoryName,
     );
-    return this.recipeRepository.updateRecipe(id, category.id, updateRecipeDto);
+    return this.recipeRepository.updateRecipe(id, category, updateRecipeDto);
   }
 
   softDelete(id: string) {

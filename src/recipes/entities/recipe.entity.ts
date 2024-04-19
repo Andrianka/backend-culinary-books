@@ -27,10 +27,6 @@ export class Recipe extends BaseEntity {
   approved: boolean;
 
   @Index()
-  @Property()
-  categoryId: string;
-
-  @Index()
   @Property({ nullable: true, type: 'timestamptz' })
   deletedAt?: Date;
 

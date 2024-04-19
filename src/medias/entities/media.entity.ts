@@ -5,10 +5,10 @@ import { Recipe } from '../../recipes/entities/recipe.entity';
 
 @Entity()
 export class Media extends BaseEntity {
-  @Property()
+  @Property({ type: 'string' })
   public name: string;
 
-  @Property()
+  @Property({ type: 'string' })
   public path: string;
 
   @Property({ default: 0, type: 'bigint' })
@@ -20,6 +20,6 @@ export class Media extends BaseEntity {
   @Property({ name: 'mime_type', nullable: true })
   public mimeType?: string;
 
-  @ManyToOne()
+  @ManyToOne({ entity: () => Recipe, nullable: true })
   recipe: Recipe;
 }

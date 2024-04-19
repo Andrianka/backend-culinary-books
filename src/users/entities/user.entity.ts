@@ -8,6 +8,7 @@ import {
 import { BaseEntity } from '../../common/BaseEntity.entity';
 import { UserRole, UserRoleType } from '../types';
 import { UserRepository } from '../users.repository';
+import { Exclude } from 'class-transformer';
 
 @Entity({ repository: () => UserRepository })
 export class User extends BaseEntity {
@@ -28,4 +29,8 @@ export class User extends BaseEntity {
   @Index()
   @Property({ nullable: true, type: 'timestamptz' })
   deletedAt?: Date;
+
+  @Property()
+  @Exclude()
+  public refreshHashToken?: string;
 }

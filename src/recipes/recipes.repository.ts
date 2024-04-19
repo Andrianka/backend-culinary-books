@@ -9,6 +9,7 @@ import {
   RecipeNotFoundException,
 } from './exceptions/';
 import { RecipeDeleteResponse } from './interfaces/responses/recipeDelete.response';
+import { Category } from '../categories/entities/category.entity';
 
 export class RecipeRepository extends EntityRepository<Recipe> {
   async getById(id: string, filters?): Promise<Recipe> {
@@ -42,11 +43,11 @@ export class RecipeRepository extends EntityRepository<Recipe> {
 
   async updateRecipe(
     id: string,
-    categoryId: string,
+    category: Category,
     updateRecipeDto: UpdateRecipeDto,
   ): Promise<Recipe> {
     const recipe = await this.findOneOrFail({ id });
-    wrap(recipe).assign({ approved: updateRecipeDto.approved, categoryId });
+    wrap(recipe).assign({ approved: updateRecipeDto.approved, category });
     const errors = await validate(recipe);
 
     if (errors.length > 0) {

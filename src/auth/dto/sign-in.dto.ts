@@ -1,12 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
-import { UserRoleType } from '../types';
 
-export class CreateUserDto {
+export class SignInDto {
   @IsNotEmpty()
   email!: string;
 
   @IsNotEmpty()
   password!: string;
-
-  role?: UserRoleType;
 }
